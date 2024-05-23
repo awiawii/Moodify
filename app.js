@@ -9,16 +9,13 @@ app.use(bodyParser.json());
 app.use(cookieParser());
 
 const authRoute = require('./routes/auth');
-const userRoute = require('./routes/user');
-const toolsRoute = require('./routes/tools');
 const corsOptions = {
     credentials: true, 
-    origin: ['']
+    origin: ['https://127.0.0.1:3000']
 };
 
 app.use(cors(corsOptions));
 app.use("/auth", authRoute);
-app.use("/user", userRoute);
-app.use("/tools", toolsRoute);
+
 
 module.exports = app;
