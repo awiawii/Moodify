@@ -1,4 +1,4 @@
-const { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, fetchSignInMethodsForEmail, signOut } = require('firebase/auth');
+const { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, fetchSignInMethodsForEmail, signOut, sendEmailVerification } = require('firebase/auth');
 const admin = require('../config/firebaseAdmin');
 const { OAuth2Client } = require('google-auth-library');
 
@@ -11,10 +11,20 @@ exports.signin = (req, res) => {
     signInWithEmailAndPassword(auth, email, password)
         .then((userCredential) => {
             const user = userCredential.user;
-            res.status(200).json({
-                message: 'Login successful',
-                user: user
-            });
+            const status = user.emailVerified;
+
+            if (status) {
+                res.status(200).json({
+                    message: 'Login successful',
+                    user: user
+                });
+            } else {
+                res.status(403).json({
+                    code: 403,
+                    status: 'Forbidden',
+                    error: 'Email is not verified!'
+                });
+            }
         })
         .catch((error) => {
             const errorCode = error.code;
@@ -43,11 +53,13 @@ exports.register = async (req, res) => {
         }
 
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-        const user = userCredential.user;
+        sendEmailVerification(auth.currentUser).then(() => {
+            const user = userCredential.user;
 
-        res.status(201).json({
-            message: 'Registration successful',
-            user: user
+            res.status(201).json({
+                message: 'Email Verification sent!',
+                user: user
+            });
         });
     } catch (error) {
         const errorCode = error.code;
@@ -63,7 +75,7 @@ exports.register = async (req, res) => {
 
 exports.signinWithGoogle = async (req, res) => {
     const { idToken } = req.body;
-    
+
     try {
         // Verifikasi token ID Google
         const ticket = await client.verifyIdToken({
@@ -103,7 +115,7 @@ exports.signinWithGoogle = async (req, res) => {
 
 exports.logout = (req, res) => {
     const auth = getAuth();
-    
+
     signOut(auth).then(() => {
         res.status(200).json({
             message: 'Logout successful'
@@ -114,3 +126,10 @@ exports.logout = (req, res) => {
         });
     });
 };
+
+exports.protectedExample = (req, res) => {
+    res.status(200).json({
+        message: 'You have accessed a protected route',
+        user: req.user
+    });
+}
