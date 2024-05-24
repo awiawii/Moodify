@@ -95,7 +95,7 @@ exports.signinWithGoogle = async (req, res) => {
                 });
             }
             throw error;
-        });a
+        });
         const firebaseToken = await admin.auth().createCustomToken(userRecord.uid);
         
         const response = await axios.post(`https://identitytoolkit.googleapis.com/v1/accounts:signInWithCustomToken?key=AIzaSyBaaRRy-CDpf2vOAXKnZRTMuaYlBGZp3Hc`, {
