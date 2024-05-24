@@ -1,6 +1,7 @@
 const { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, fetchSignInMethodsForEmail, signOut, sendEmailVerification } = require('firebase/auth');
 const admin = require('../config/firebaseAdmin');
 const { OAuth2Client } = require('google-auth-library');
+const axios = require('axios');
 
 const client = new OAuth2Client('643160831565-9q86k9e9metjf16r2t6266kela9ac720.apps.googleusercontent.com');
 
@@ -94,15 +95,24 @@ exports.signinWithGoogle = async (req, res) => {
                 });
             }
             throw error;
+        });a
+        const firebaseToken = await admin.auth().createCustomToken(userRecord.uid);
+        
+        const response = await axios.post(`https://identitytoolkit.googleapis.com/v1/accounts:signInWithCustomToken?key=AIzaSyBaaRRy-CDpf2vOAXKnZRTMuaYlBGZp3Hc`, {
+            token: firebaseToken,
+            returnSecureToken: true
         });
 
-        // Membuat token khusus Firebase untuk pengguna
-        const firebaseToken = await admin.auth().createCustomToken(userRecord.uid);
+        const idTokenData = response.data;
 
         res.status(200).json({
             message: 'Google Sign-In successful',
-            token: firebaseToken,
-            user: userRecord
+            user: userRecord,
+            stsTokenManager: {
+                refreshToken: idTokenData.refreshToken,
+                accessToken: idTokenData.idToken,
+                expirationTime: Date.now() + parseInt(idTokenData.expiresIn, 10) * 1000
+            }
         });
     } catch (error) {
         res.status(401).json({
@@ -118,7 +128,8 @@ exports.logout = (req, res) => {
 
     signOut(auth).then(() => {
         res.status(200).json({
-            message: 'Logout successful'
+            message: 'Logout successful',
+            auth:auth
         });
     }).catch((error) => {
         res.status(500).json({
