@@ -123,19 +123,27 @@ exports.signinWithGoogle = async (req, res) => {
     }
 };
 
-exports.logout = (req, res) => {
-    const auth = getAuth();
+exports.logout = async (req, res) => {
+    const { uid } = req.body;
 
-    signOut(auth).then(() => {
+    try {
+        await admin.auth().revokeRefreshTokens(uid);
+
+        const userRecord = await admin.auth().getUser(uid);
+        const timestamp = new Date(userRecord.tokensValidAfterTime).getTime() / 1000;
+        
         res.status(200).json({
             message: 'Logout successful',
-            auth:auth
+            uid: uid,
+            tokensValidAfter: timestamp
         });
-    }).catch((error) => {
+    } catch (error) {
         res.status(500).json({
-            error: 'Unable to logout'
+            code: 500,
+            status: 'Internal Server Error',
+            error: error.message,
         });
-    });
+    }
 };
 
 exports.protectedExample = (req, res) => {

@@ -14,15 +14,33 @@ const authMiddleware = async (req, res, next) => {
     const token = authHeader.split(' ')[1];
 
     try {
-        const decodedToken = await admin.auth().verifyIdToken(token);
+        // Set checkRevoked to true to ensure the token has not been revoked
+        const decodedToken = await admin.auth().verifyIdToken(token, true);
         req.user = decodedToken;
         next();
     } catch (error) {
-        return res.status(401).json({
-            code: 401,
-            status: 'Unauthorized',
-            error: 'Invalid token'
-        });
+        if (error.code === 'auth/id-token-revoked') {
+            // Token has been revoked
+            return res.status(401).json({
+                code: 401,
+                status: 'Unauthorized',
+                error: 'Token has been revoked'
+            });
+        } else if (error.code === 'auth/argument-error') {
+            // Invalid token
+            return res.status(401).json({
+                code: 401,
+                status: 'Unauthorized',
+                error: 'Invalid token'
+            });
+        } else {
+            // Other errors
+            return res.status(401).json({
+                code: 401,
+                status: 'Unauthorized',
+                error: 'Authentication error'
+            });
+        }
     }
 };
 
