@@ -14,7 +14,12 @@ app.use(cookieParser());
 
 const authRoute = require('./routes/auth');
 
-app.use(cors());
+const corsOptions = {
+    credentials: true, 
+    origin: ['0.0.0.0']
+};
+
+app.use(cors(corsOptions));
 
 app.use("/auth", authRoute);
 
