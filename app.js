@@ -13,6 +13,7 @@ app.use(bodyParser.json());
 app.use(cookieParser());
 
 const authRoute = require('./routes/auth');
+const toolRoute = require('./routes/tools');
 
 const corsOptions = {
     credentials: true, 
@@ -22,6 +23,7 @@ const corsOptions = {
 app.use(cors(corsOptions));
 
 app.use("/auth", authRoute);
+app.use("/tool", toolRoute);
 
 
 module.exports = app;
