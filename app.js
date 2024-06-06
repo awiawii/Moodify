@@ -15,7 +15,7 @@ app.use(cookieParser());
 const authRoute = require('./routes/auth');
 const toolRoute = require('./routes/tools');
 const userInfoRouter = require('./routes/userInfo');
-
+const copingRoute = require('./routes/copings');
 
 const corsOptions = {
     credentials: true, 
@@ -28,5 +28,5 @@ app.use("/auth", authRoute);
 app.use("/tool", toolRoute);
 
 app.use('/userinfo', userInfoRouter);
-
+app.use("/coping", copingRoute);
 module.exports = app;
