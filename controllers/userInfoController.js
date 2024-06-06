@@ -10,7 +10,7 @@ const mkdirp = require('mkdirp');
 // Konfigurasi multer untuk unggah foto profil
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
-      const uploadDir = 'uploads/profile_pictures/';
+      const uploadDir = 'uploads/profile-pictures/';
       mkdirp(uploadDir, function (err) {
         if (err) {
           console.error(err);
@@ -21,7 +21,7 @@ const storage = multer.diskStorage({
       });
     },
     filename: function (req, file, cb) {
-      cb(null, Date.now() + path.extname(file.originalname)); // Menambahkan ekstensi file
+      cb(null, Date.now() + path.extname(file.originalname)); 
     }
   });
   
