@@ -13,7 +13,7 @@ module.exports = (sequelize, DataTypes) => {
   }
   Journal.init({
     journal_id: {type:DataTypes.STRING,primaryKey:true},
-    user_id: DataTypes.STRING,
+    uid: DataTypes.STRING,
     journal_title: DataTypes.STRING,
     journal_text: DataTypes.TEXT
   }, {

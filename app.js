@@ -14,6 +14,8 @@ app.use(cookieParser());
 
 const authRoute = require('./routes/auth');
 const toolRoute = require('./routes/tools');
+const userInfoRouter = require('./routes/userInfo');
+
 
 const corsOptions = {
     credentials: true, 
@@ -24,6 +26,7 @@ app.use(cors(corsOptions));
 
 app.use("/auth", authRoute);
 app.use("/tool", toolRoute);
-
+app.use('/user', userInfoRouter);
+app.use("/uploads", express.static('uploads'));
 
 module.exports = app;
