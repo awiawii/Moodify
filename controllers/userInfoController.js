@@ -30,7 +30,8 @@ const storage = multer.diskStorage({
 // Menambahkan data diri pengguna (hanya JSON)
 exports.addProfile = async (req, res) => {
     try {
-        const { uid, name, gender, birthday, country, phone_number } = req.body;
+        const { name, gender, birthday, country, phone_number } = req.body;
+        const uid = req.user.uid;
 
         // Periksa apakah UID sudah ada di Firebase Authentication
         const userRecord = await admin.auth().getUser(uid);
@@ -137,7 +138,7 @@ exports.uploadProfilePicture = [
 // Mendapatkan semua data pengguna
 exports.getAllProfiles = async (req, res) => {
     try {
-        const profiles = await models.User_Info.findAll();
+        const profiles = await models.User_Info.findOne({where:{uid:req.user.uid}});
         res.status(200).json(profiles);
     } catch (error) {
         console.error(error);
