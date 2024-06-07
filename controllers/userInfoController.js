@@ -135,8 +135,8 @@ exports.uploadProfilePicture = [
     }
   ];
 
-// Mendapatkan semua data pengguna
-exports.getAllProfiles = async (req, res) => {
+
+exports.getProfile = async (req, res) => {
     try {
         const profiles = await models.User_Info.findOne({where:{uid:req.user.uid}});
         res.status(200).json(profiles);
@@ -146,5 +146,19 @@ exports.getAllProfiles = async (req, res) => {
             error: 'Gagal mengambil data profil'
         });
     }
+};
+
+exports.getAllProfiles = async (req, res) => {
+  try {
+      const journal = await models.Journal.findAll();
+      return res.status(200).json({
+        journal:journal
+    });
+  } catch (error) {
+      console.error(error);
+      res.status(500).json({
+          error: 'Gagal mengambil data profil'
+      });
+  }
 };
 

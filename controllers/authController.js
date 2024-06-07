@@ -121,6 +121,15 @@ exports.signinWithGoogle = async (req, res) => {
             userRecord = await admin.auth().getUser(userRecord.uid);
         }
 
+        models.User_Info.findOne({where:{uid:userRecord.uid}}).then(async result => {
+            if(!result){
+                const user_info = {
+                    uid:userRecord.uid,
+                }        
+                await models.User_Info.create(user_info);
+            }
+        });
+
         const firebaseToken = await admin.auth().createCustomToken(userRecord.uid);
         
         const response = await axios.post(`https://identitytoolkit.googleapis.com/v1/accounts:signInWithCustomToken?key=AIzaSyBaaRRy-CDpf2vOAXKnZRTMuaYlBGZp3Hc`, {
