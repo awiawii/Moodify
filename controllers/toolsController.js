@@ -8,7 +8,7 @@ async function addJournal(req, res){
         const currentDate = new Date().toISOString().split('T')[0];
         await models.Journal.findOne({
             where: {
-                user_id: req.params.id,
+                uid: req.user.uid,
                 createdAt: {
                     [Op.between]: [`${currentDate} 00:00:00`, `${currentDate} 23:59:59`]
                 }
@@ -27,7 +27,7 @@ async function addJournal(req, res){
                     journal_id:j_id,
                     journal_title:req.body.journal_title,
                     journal_text: req.body.journal_text,
-                    user_id: req.params.id
+                    uid: req.user.uid
                 }
 
                 await models.Journal.create(journal).then(async journal => {
@@ -72,7 +72,7 @@ async function addJournal(req, res){
 }
 
 function getJournals(req, res){
-    models.Journal.findAll({where: {user_id:req.params.id}}).then(result =>{
+    models.Journal.findAll({where: {uid:req.user.uid}}).then(result =>{
         return res.status(200).json({
             journal:result
         });
@@ -86,7 +86,7 @@ function getJournals(req, res){
 
 function getTodayJournal(req, res){
     const currentDate = new Date().toISOString().split('T')[0];
-    models.Journal.findAll({where: {user_id:req.params.id, createdAt:{[Op.between]: [`${currentDate} 00:00:00`, `${currentDate} 23:59:59`]}}}).then(result =>{
+    models.Journal.findAll({where: {uid:req.user.uid, createdAt:{[Op.between]: [`${currentDate} 00:00:00`, `${currentDate} 23:59:59`]}}}).then(result =>{
         return res.status(200).json({
             journal:result
         });
@@ -102,7 +102,7 @@ function getTodayMood(req, res){
     const currentDate = new Date().toISOString().split('T')[0];
     models.User_Info.findAll({
         where: {
-            user_id:req.params.id
+            uid:req.user.uid
         },
         include: [{
             model: models.Journal,
@@ -135,7 +135,7 @@ function getWeeklyMoods(req, res){
     const currentDate = new Date().toISOString().split('T')[0];
     models.User_Info.findAll({
         where: {
-            user_id: req.params.id
+            uid: req.user.uid
         },
         include: [{
             model: models.Journal,
@@ -179,7 +179,7 @@ async function updateJournal(req, res) {
         }
         await models.Journal.update(journal, {
             where: {
-                user_id: req.params.id,
+                uid: req.user.uid,
                 createdAt: {
                     [Op.between]: [`${currentDate} 00:00:00`, `${currentDate} 23:59:59`]
                 }

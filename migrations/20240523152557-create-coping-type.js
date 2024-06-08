@@ -8,6 +8,14 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.STRING
       },
+      mood_coping_id: {
+        allowNull: false,
+        type: Sequelize.STRING,
+        references: {
+          model: 'Mood_Copings',
+          key: 'mood_coping_id'
+        }
+      },
       coping_type_name: {
         allowNull: false,
         type: Sequelize.STRING

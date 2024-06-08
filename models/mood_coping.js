@@ -1,22 +1,23 @@
+//models//mood_coping.js
+
 'use strict';
 const {
   Model
 } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
   class Mood_Coping extends Model {
-    /**
-     * Helper method for defining associations.
-     * This method is not a part of Sequelize lifecycle.
-     * The `models/index` file will call this method automatically.
-     */
     static associate(models) {
-      // define association here
+      Mood_Coping.belongsTo(models.Mood_Log, { foreignKey: 'mood_log_id' });
+      Mood_Coping.belongsTo(models.Coping_Type, { foreignKey: 'coping_type_id' });
     }
   }
   Mood_Coping.init({
-    mood_log_id: DataTypes.STRING,
+    mood_coping_id: {
+      type: DataTypes.STRING,
+      primaryKey: true
+    },
     coping_type_id: DataTypes.STRING,
-    coping_tool_id: DataTypes.STRING
+    mood_type: DataTypes.STRING
   }, {
     sequelize,
     modelName: 'Mood_Coping',

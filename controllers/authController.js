@@ -2,6 +2,7 @@ const { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, fet
 const admin = require('../config/firebaseAdmin');
 const { OAuth2Client } = require('google-auth-library');
 const axios = require('axios');
+const models = require('../models');
 
 const client = new OAuth2Client('643160831565-9q86k9e9metjf16r2t6266kela9ac720.apps.googleusercontent.com');
 
@@ -57,9 +58,24 @@ exports.register = async (req, res) => {
         sendEmailVerification(auth.currentUser).then(() => {
             const user = userCredential.user;
 
-            res.status(201).json({
-                message: 'Email Verification sent!',
-                user: user
+            models.User_Info.findOne({where:{uid:user.uid}}).then(async result => {
+                if(!result){
+                    const user_info = {
+                        uid:user.uid,
+                        name:req.body.name
+                    }        
+                    await models.User_Info.create(user_info).then(user_info=>{
+                        res.status(201).json({
+                            message: 'Email Verification sent!',
+                            user: {user,user_info}
+                        });
+                    }).catch(error=>{
+                        return res.status(500).json({
+                            message: "Something went wrong",
+                            error:error
+                        });
+                    });
+                }
             });
         });
     } catch (error) {
@@ -96,6 +112,15 @@ exports.signinWithGoogle = async (req, res) => {
             }
             throw error;
         });
+
+
+        if (!userRecord.emailVerified) {
+            await admin.auth().updateUser(userRecord.uid, {
+                emailVerified: true
+            });
+            userRecord = await admin.auth().getUser(userRecord.uid);
+        }
+
         const firebaseToken = await admin.auth().createCustomToken(userRecord.uid);
         
         const response = await axios.post(`https://identitytoolkit.googleapis.com/v1/accounts:signInWithCustomToken?key=AIzaSyBaaRRy-CDpf2vOAXKnZRTMuaYlBGZp3Hc`, {
@@ -149,6 +174,6 @@ exports.logout = async (req, res) => {
 exports.protectedExample = (req, res) => {
     res.status(200).json({
         message: 'You have accessed a protected route',
-        user: req.user
+        user: req.user.uid
     });
 }

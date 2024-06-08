@@ -10,14 +10,22 @@ module.exports = {
       },
       coping_type_id: {
         allowNull: false,
-        type: Sequelize.STRING
+        type: Sequelize.STRING,
+        references: {
+          model: 'Coping_Types',
+          key: 'coping_type_id'
+        }
       },
       coping_tool_name: {
         allowNull: false,
         type: Sequelize.STRING
       },
+      text: {
+        allowNull: true,
+        type: Sequelize.STRING
+      },
       content_url: {
-        allowNull: false,
+        allowNull: true,
         type: Sequelize.STRING
       },
       createdAt: {

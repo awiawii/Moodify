@@ -3,17 +3,14 @@
 module.exports = {
   async up(queryInterface, Sequelize) {
     await queryInterface.createTable('Mood_Copings', {
-      mood_log_id: {
+      mood_coping_id: {
         allowNull: false,
-        type: Sequelize.STRING
+        primaryKey: true,
+        type: Sequelize.STRING(16)
       },
-      coping_type_id: {
+      mood_type: {
         allowNull: false,
-        type: Sequelize.STRING
-      },
-      coping_tool_id: {
-        allowNull: false,
-        type: Sequelize.STRING
+        type: Sequelize.STRING(16)
       },
       createdAt: {
         allowNull: false,

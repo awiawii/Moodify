@@ -26,7 +26,8 @@ app.use(cors(corsOptions));
 
 app.use("/auth", authRoute);
 app.use("/tool", toolRoute);
-
-app.use('/userinfo', userInfoRouter);
+app.use('/user', userInfoRouter);
 app.use("/coping", copingRoute);
+
+
 module.exports = app;
