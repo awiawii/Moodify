@@ -9,8 +9,7 @@ const router = express.Router();
 router.post('/login', signin);
 router.post('/register', register);
 router.post('/login/google', signinWithGoogle); 
-router.post('/logout', logout);
-
+router.post('/logout', authMiddleware, logout);
 router.get('/protected-route', authMiddleware, protectedExample);
 
 module.exports = router;

@@ -158,7 +158,7 @@ exports.signinWithGoogle = async (req, res) => {
 };
 
 exports.logout = async (req, res) => {
-    const { uid } = req.body;
+    const { uid } = req.user.uid;
 
     try {
         await admin.auth().revokeRefreshTokens(uid);
