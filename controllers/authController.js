@@ -6,6 +6,7 @@ const models = require('../models');
 
 const client = new OAuth2Client('643160831565-9q86k9e9metjf16r2t6266kela9ac720.apps.googleusercontent.com');
 
+
 exports.signin = (req, res) => {
     const { email, password } = req.body;
     const auth = getAuth();
@@ -17,7 +18,7 @@ exports.signin = (req, res) => {
 
             if (status) {
                 res.status(200).json({
-                    message: 'Login successful',
+                    message: 'Login successful!',
                     user: user
                 });
             } else {
