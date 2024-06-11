@@ -1,19 +1,19 @@
 steps:
 # Step 1: Build the Docker image
 - name: 'gcr.io/cloud-builders/docker'
-  args: ['build', '-t', 'gcr.io/$PROJECT_ID/moodify-coba', '.']
+  args: ['build', '-t', 'gcr.io/$PROJECT_ID/moodify', '.']
 
 # Step 2: Push the Docker image to Google Container Registry
 - name: 'gcr.io/cloud-builders/docker'
-  args: ['push', 'gcr.io/$PROJECT_ID/moodify-coba']
+  args: ['push', 'gcr.io/$PROJECT_ID/moodify']
 
 # Step 3: Deploy to Cloud Run
 - name: 'gcr.io/cloud-builders/gcloud'
   args:
   - 'run'
   - 'deploy'
-  - 'moodify-coba'
-  - '--image=gcr.io/$PROJECT_ID/moodify-coba'
+  - 'moodify'
+  - '--image=gcr.io/$PROJECT_ID/moodify'
   - '--platform=managed'
   - '--region=asia-southeast2'
   - '--allow-unauthenticated'
