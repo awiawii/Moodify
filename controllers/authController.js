@@ -17,7 +17,7 @@ exports.signin = (req, res) => {
 
             if (status) {
                 res.status(200).json({
-                    message: 'Login successful!',
+                    message: 'Login successful',
                     user: user
                 });
             } else {
