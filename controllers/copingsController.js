@@ -1,6 +1,7 @@
-const { Mood_Log, Mood_Coping, Coping_Type, Coping_Tool } = require('../models');
+const { Mood_Log, Mood_Coping, Coping_Type, Coping_Tool, User_Info, Journal } = require('../models');
+const { Op } = require('sequelize');
 
-// buat acak data
+// Function to shuffle an array
 function shuffle(array) {
     for (let i = array.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
@@ -10,25 +11,39 @@ function shuffle(array) {
 }
 
 exports.getCopingRecommendations = async (req, res) => {
-    const journalId = req.params.journal_id;
-    console.log(`Received request for journal_id: ${journalId}`);
+    const userId = req.user.uid; // Assumes req.user contains authenticated user information
+    const currentDate = new Date().toISOString().split('T')[0]; // Get current date in YYYY-MM-DD format
+    console.log(`Received request for user_id: ${userId} on date: ${currentDate}`);
 
     try {
-        // Step 1: ambil mood terakhir
-        const latestMoodLog = await Mood_Log.findOne({
-            attributes: ['mood'],
-            where: { journal_id: journalId },
-            order: [['createdAt', 'DESC']]
+        // Step 1: Fetch the latest mood log for the user based on today's date
+        const userJournal = await User_Info.findOne({
+            where: { uid: userId },
+            include: [{
+                model: Journal,
+                as: 'Journal',
+                where: {
+                    createdAt: { [Op.between]: [`${currentDate} 00:00:00`, `${currentDate} 23:59:59`] }
+                },
+                include: [{
+                    model: Mood_Log,
+                    as: 'Mood',
+                    where: {
+                        createdAt: { [Op.between]: [`${currentDate} 00:00:00`, `${currentDate} 23:59:59`] }
+                    },
+                    order: [['createdAt', 'DESC']]
+                }]
+            }]
         });
 
-        if (!latestMoodLog) {
-            return res.status(404).json({ message: "No mood logs found for this journal_id" });
+        if (!userJournal || !userJournal.Journal.length || !userJournal.Journal[0].Mood.length) {
+            return res.status(404).json({ message: "No mood logs found for the user today" });
         }
 
-        const latestMood = latestMoodLog.mood;
+        const latestMood = userJournal.Journal[0].Mood[0].mood;
         console.log(`Latest mood: ${latestMood}`);
 
-        // Step 2: dapetin mood_coping_id
+        // Step 2: Get the mood_coping_id based on the latest mood
         const moodCoping = await Mood_Coping.findOne({
             attributes: ['mood_coping_id'],
             where: { mood_type: latestMood }
@@ -41,7 +56,7 @@ exports.getCopingRecommendations = async (req, res) => {
         const moodCopingId = moodCoping.mood_coping_id;
         console.log(`Mood coping ID: ${moodCopingId}`);
 
-        // Step 3: dapetin coping_type_id
+        // Step 3: Get the coping_type_id based on the mood_coping_id
         const copingTypes = await Coping_Type.findAll({
             attributes: ['coping_type_id', 'coping_type_name'],
             where: { mood_coping_id: moodCopingId }
@@ -54,7 +69,7 @@ exports.getCopingRecommendations = async (req, res) => {
         const copingTypeIds = copingTypes.map(type => type.coping_type_id);
         console.log(`Coping type IDs: ${copingTypeIds.join(', ')}`);
 
-        // Step 4: dapetin coping tools
+        // Step 4: Get coping tools based on the coping_type_id
         let copingTools = await Coping_Tool.findAll({
             attributes: ['coping_tool_name', 'text', 'content_url', 'coping_type_id'],
             where: { coping_type_id: copingTypeIds }
@@ -62,7 +77,7 @@ exports.getCopingRecommendations = async (req, res) => {
 
         console.log(`Coping tools found: ${copingTools.length}`);
 
-        // mengkategorikan coping tools berdasarkan coping_type_name
+        // Categorize coping tools based on coping_type_name
         let recommendations = {
             text_affirmation_first: [],
             text_affirmation_last: [],
@@ -91,14 +106,14 @@ exports.getCopingRecommendations = async (req, res) => {
             }
         });
 
-        // Shuffle arrays dengan rekomendasi
+        // Shuffle arrays with recommendations
         shuffle(recommendations.text_affirmation_first);
         shuffle(recommendations.text_affirmation_last);
         shuffle(recommendations.text_instruction);
         shuffle(recommendations.urls.music);
         shuffle(recommendations.urls.podcast);
 
-        // Rotate arrays to agar ganti setiap waktu
+        // Rotate arrays to change recommendations each time
         recommendations.text_affirmation_first.push(recommendations.text_affirmation_first.shift());
         recommendations.text_affirmation_last.push(recommendations.text_affirmation_last.shift());
         recommendations.text_instruction.push(recommendations.text_instruction.shift());
