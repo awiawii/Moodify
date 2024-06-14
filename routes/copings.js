@@ -9,6 +9,6 @@ const authMiddleware = require('../middleware/authMiddleware');
 router.use(authMiddleware);
 
 // Route to get coping recommendations based on the latest mood in mood_logs
-router.get('/coping-recommendations/:journal_id', copingsController.getCopingRecommendations);
+router.get('/coping-recommendations/', copingsController.getCopingRecommendations);
 
 module.exports = router;
