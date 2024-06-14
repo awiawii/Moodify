@@ -3,67 +3,45 @@ const { Op, fn, col, literal } = require('sequelize');
 const models = require('../models');
 
 
-async function addJournal(req, res){
+async function addJournal(req, res) {
     try {
-        const currentDate = new Date().toISOString().split('T')[0];
-        await models.Journal.findOne({
-            where: {
-                uid: req.user.uid,
-                createdAt: {
-                    [Op.between]: [`${currentDate} 00:00:00`, `${currentDate} 23:59:59`]
-                }
-            }
-        }).then(async result => {
-            if(result){
-                return res.status(400).json({
-                    result: result,
-                    message: "A journal entry for today already exists."
-                });
-            }
-            else{
-                const j_id = nanoid(16);
-                const m_id = nanoid(16);
-                const journal = {
-                    journal_id:j_id,
-                    journal_title:req.body.journal_title,
-                    journal_text: req.body.journal_text,
-                    uid: req.user.uid
-                }
+        const j_id = nanoid(16);
+        const m_id = nanoid(16);
+        const journal = {
+            journal_id: j_id,
+            journal_title: req.body.journal_title,
+            journal_text: req.body.journal_text,
+            uid: req.user.uid
+        }
 
-                await models.Journal.create(journal).then(async journal => {
-                    const mood_log = {
-                        mood_log_id:m_id,
-                        journal_id:j_id,
-                        mood:req.body.mood
+        await models.Journal.create(journal).then(async journal => {
+            const mood_log = {
+                mood_log_id: m_id,
+                journal_id: j_id,
+                mood: req.body.mood
+            }
+            await models.Mood_Log.create(mood_log).then(mood => {
+                return res.status(201).json({
+                    message: "Journal created successfully",
+                    result: {
+                        journal,
+                        mood
                     }
-                    await models.Mood_Log.create(mood_log).then(mood => {
-                        return res.status(201).json({
-                            message: "Journal created successfully",
-                            result: {
-                                journal,
-                                mood
-                            }
-                        });
-                    }).catch(error=>{
-                        return res.status(500).json({
-                            message: "Something went wrong",
-                            error:error
-                        });
-                    })        
-                }).catch(error =>{
-                    return res.status(500).json({
-                        message: "Something went wrong",
-                        error:error
-                    });
                 });
-            }  
-        }).catch( error=> {
+            }).catch(error => {
+                return res.status(500).json({
+                    message: "Something went wrong",
+                    error: error
+                });
+            })
+        }).catch(error => {
             return res.status(500).json({
                 message: "Something went wrong",
-                error:error
+                error: error
             });
-        });       
-    } catch (error) {
+        });
+    }
+    catch (error) {
         return res.status(500).json({
             message: "Something went wrong1",
             error: error
