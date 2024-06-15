@@ -8,7 +8,7 @@ module.exports = (sequelize, DataTypes) => {
   class Mood_Coping extends Model {
     static associate(models) {
       Mood_Coping.belongsTo(models.Mood_Log, { foreignKey: 'mood_log_id' });
-      Mood_Coping.belongsTo(models.Coping_Type, { foreignKey: 'coping_type_id' });
+      Mood_Coping.hasMany(models.Coping_Type, { foreignKey: 'mood_coping_id' });
     }
   }
   Mood_Coping.init({
@@ -16,8 +16,6 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       primaryKey: true
     },
-    coping_type_id: DataTypes.STRING,
-    mood_type: DataTypes.STRING
   }, {
     sequelize,
     modelName: 'Mood_Coping',

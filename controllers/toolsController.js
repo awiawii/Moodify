@@ -2,7 +2,6 @@ const { nanoid}  = require('nanoid');
 const { Op, fn, col, literal } = require('sequelize');
 const models = require('../models');
 
-
 async function addJournal(req, res){
     try {
         const currentDate = new Date().toISOString().split('T')[0];

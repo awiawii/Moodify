@@ -1,3 +1,5 @@
+//controllers/authController.js
+
 const { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, fetchSignInMethodsForEmail, signOut, sendEmailVerification } = require('firebase/auth');
 const admin = require('../config/firebaseAdmin');
 const { OAuth2Client } = require('google-auth-library');
