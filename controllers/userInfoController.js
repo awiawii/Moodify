@@ -29,42 +29,58 @@ const storage = multer.diskStorage({
 
 // Menambahkan data diri pengguna (hanya JSON)
 exports.addProfile = async (req, res) => {
-    try {
-        const { name, gender, birthday, country, phone_number } = req.body;
-        const uid = req.user.uid;
+  try {
+      const { gender, birthday, country, phone_number } = req.body;
+      const uid = req.user.uid;
 
-        // Periksa apakah UID sudah ada di Firebase Authentication
-        const userRecord = await admin.auth().getUser(uid);
+      // Check if the UID exists in Firebase Authentication
+      const userRecord = await admin.auth().getUser(uid);
 
-        if (!userRecord) {
-            return res.status(404).json({
-                code: 404,
-                status: 'Not Found',
-                error: 'Pengguna dengan UID yang ditentukan tidak ditemukan di Firebase Authentication'
-            });
-        }
+      if (!userRecord) {
+          return res.status(404).json({
+              code: 404,
+              status: 'Not Found',
+              error: 'Pengguna dengan UID yang ditentukan tidak ditemukan di Firebase Authentication'
+          });
+      }
 
-        // Tambahkan data diri pengguna ke database
-        await models.User_Info.create({
-            uid,
-            name,
-            gender,
-            birthday,
-            country,
-            phone_number,
-            profile_picture: null // Awalnya, nggak ada foto profil
-        });
+      // Check if the user's profile already exists in the database
+      let profile = await models.User_Info.findOne({ where: { uid } });
 
-        res.status(200).json({
-            message: 'Profil berhasil ditambahkan'
-        });
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({
-            error: 'Gagal menambahkan profil'
-        });
-    }
+      if (profile) {
+          // If the profile exists, update it
+          profile.gender = gender;
+          profile.birthday = birthday;
+          profile.country = country;
+          profile.phone_number = phone_number;
+          await profile.save();
+
+          return res.status(200).json({
+              message: 'Profil berhasil diperbarui'
+          });
+      } else {
+          // If the profile does not exist, create a new profile
+          await models.User_Info.create({
+              uid,
+              gender,
+              birthday,
+              country,
+              phone_number,
+              profile_picture: null // Initially, no profile picture
+          });
+
+          return res.status(200).json({
+              message: 'Profil berhasil ditambahkan'
+          });
+      }
+  } catch (error) {
+      console.error(error);
+      res.status(500).json({
+          error: 'Gagal menambahkan atau memperbarui profil'
+      });
+  }
 };
+
 
 // Mengubah data diri pengguna (hanya JSON)
 exports.updateProfile = async (req, res) => {

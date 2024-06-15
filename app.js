@@ -6,7 +6,6 @@ const firebaseApp = require('./config/Configfirebase'); // Ensuring Firebase is 
 require('firebase/auth');
 require("dotenv").config();
 
-
 const app = express();
 
 app.use(bodyParser.json());
@@ -16,9 +15,10 @@ const authRoute = require('./routes/auth');
 const toolRoute = require('./routes/tools');
 const userInfoRouter = require('./routes/userInfo');
 const copingRoute = require('./routes/copings');
+const copingCategoryRouter = require('./routes/copingCategory'); // Corrected require statement
 
 const corsOptions = {
-    credentials: true, 
+    credentials: true,
     origin: ['0.0.0.0']
 };
 
@@ -28,6 +28,6 @@ app.use("/auth", authRoute);
 app.use("/tool", toolRoute);
 app.use('/user', userInfoRouter);
 app.use("/coping", copingRoute);
-
+app.use("/copingCategory", copingCategoryRouter); // Using the router
 
 module.exports = app;
