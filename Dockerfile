@@ -19,15 +19,15 @@ RUN curl -o /usr/local/bin/cloud_sql_proxy https://storage.googleapis.com/cloud-
 
 # Set environment variables
 ENV PORT 8080
-ENV API_KEY=AIzaSyBaaRRy-CDpf2vOAXKnZRTMuaYlBGZp3Hc
-ENV AUTH_DOMAIN=casptone-of-ours.firebaseapp.com
-ENV PROJECT_ID=casptone-of-ours
-ENV STORAGE_BUCKET=casptone-of-ours.appspot.com
-ENV MESSAGING_SENDERID=643160831565
-ENV APP_ID=1:643160831565:web:838b20b4a4309fe08d0e04
+ENV API_KEY=<your_API_KEY>
+ENV AUTH_DOMAIN=<your_AUTH_DOMAIN>
+ENV PROJECT_ID=<your_PROJECT_ID>
+ENV STORAGE_BUCKET=<your_STORAGE_BUCKET>
+ENV MESSAGING_SENDERID=<your_MESSAGING_SENDERID>
+ENV APP_ID=<your_APP_ID>
 
 # Expose port 8080
 EXPOSE 8080
 
 # Start the Cloud SQL Auth proxy and then your Node.js application
-CMD ["sh", "-c", "/usr/local/bin/cloud_sql_proxy --address 0.0.0.0 --port 1234 casptone-of-ours:asia-southeast2:moodify-sql-instance & npm start"]
+CMD ["sh", "-c", "/usr/local/bin/cloud_sql_proxy --address 0.0.0.0 --port 1234 <your_connection> & npm start"]

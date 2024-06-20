@@ -6,7 +6,7 @@ const { OAuth2Client } = require('google-auth-library');
 const axios = require('axios');
 const models = require('../models');
 
-const client = new OAuth2Client('643160831565-9q86k9e9metjf16r2t6266kela9ac720.apps.googleusercontent.com');
+const client = new OAuth2Client('<OAuth2Client_URL>');
 
 exports.signin = (req, res) => {
     const { email, password } = req.body;
