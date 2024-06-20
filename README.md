@@ -29,7 +29,7 @@ The difference again is in the layers component. Instead of using an LSTM or GRU
 
 ## Results
     - `accuracy: 94%`
-    - `loos : 18%`
+    - `loss : 18%`
     - `Validation_loss: 36%`
     - `Validation_accuracy: 84%`
 
