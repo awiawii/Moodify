@@ -35,12 +35,12 @@ RUN curl -o /usr/local/bin/cloud_sql_proxy https://storage.googleapis.com/cloud-
 
 # Set environment variables
 ENV PORT 8080
-ENV API_KEY=AIzaSyBaaRRy-CDpf2vOAXKnZRTMuaYlBGZp3Hc
-ENV AUTH_DOMAIN=casptone-of-ours.firebaseapp.com
-ENV PROJECT_ID=casptone-of-ours
-ENV STORAGE_BUCKET=casptone-of-ours.appspot.com
-ENV MESSAGING_SENDERID=643160831565
-ENV APP_ID=1:643160831565:web:838b20b4a4309fe08d0e04
+ENV API_KEY=<api_key>
+ENV AUTH_DOMAIN=<your.firebaseapp.com>
+ENV PROJECT_ID=<your_project_id
+ENV STORAGE_BUCKET=<your_storage_bucket>
+ENV MESSAGING_SENDERID=<your_messaging_sender_id>
+ENV APP_ID=<your_app_id>
 
 # Expose port 8080
 EXPOSE 8080
