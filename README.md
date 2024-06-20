@@ -14,3 +14,8 @@ Moodify Landing Page is designed to promote our product Moodify. This React-base
 - React Router
 - HTML5
 - CSS3
+
+## Screenshots
+![Photo-2](https://github.com/awiawii/Moodify/blob/Cloud-Computing-Landing-Page/home1.png)
+![Photo-3](https://github.com/awiawii/Moodify/blob/Cloud-Computing-Landing-Page/home2.png)
+![Photo-4](https://github.com/awiawii/Moodify/blob/Cloud-Computing-Landing-Page/home2.png)
