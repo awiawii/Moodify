@@ -46,7 +46,7 @@ ENV APP_ID=<your_app_id>
 EXPOSE 8080
 
 # Start the Cloud SQL Auth proxy and then your Node.js application
-CMD ["sh", "-c", "/usr/local/bin/cloud_sql_proxy --address 0.0.0.0 --port 1234 casptone-of-ours:asia-southeast2:moodify-sql-instance & npm start"]
+CMD ["sh", "-c", "/usr/local/bin/cloud_sql_proxy --address 0.0.0.0 --port 1234 <your_sql_connection> & npm start"]
 ```
 
 - CloudBuild.yaml
