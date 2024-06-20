@@ -1,29 +1,401 @@
 
-# 
+# Moodify Cloud Computing
 
-- Udah bisa kalo aku coba di postman
-- output:
+## Modify Backend Services
+![Cloud Computing](https://github.com/mbprayoga/moodify/assets/76588831/feb59a58-5094-4746-9542-80b6adfa6249)
 
+
+## Setup and Instalation
+### Node.js
+- install all dependencies `npm install`
+- Setup configuration for database and port
+- Run the project`node run server.js`
+
+### Deployment
+- Dockerfile
 ```bash
-  {
-    "message": "Coping recommendations retrieved successfully",
-    "recommendations": {
-        "text_affirmation_first": "Stay balanced2.",
-        "text_affirmation_last": "n3utr4l is good.",
-        "text_instruction": "Embrace n3utr4lity 2.",
-        "urls": {
-            "music": "http://example.com/n3utr4l_music2",
-            "podcast": "http://example.com/n3utr4l_pod"
+# Base image
+FROM node:20
+
+# Set the working directory in the container
+WORKDIR /usr/src/app
+
+# Copy package.json and package-lock.json
+COPY package*.json ./
+
+# Install dependencies
+RUN npm install
+
+# Copy the rest of the application code
+COPY . .
+
+# Download and install Cloud SQL Auth proxy
+RUN curl -o /usr/local/bin/cloud_sql_proxy https://storage.googleapis.com/cloud-sql-connectors/cloud-sql-proxy/v2.11.3/cloud-sql-proxy.linux.amd64 \
+    && chmod +x /usr/local/bin/cloud_sql_proxy
+
+# Set environment variables
+ENV PORT 8080
+ENV API_KEY=AIzaSyBaaRRy-CDpf2vOAXKnZRTMuaYlBGZp3Hc
+ENV AUTH_DOMAIN=casptone-of-ours.firebaseapp.com
+ENV PROJECT_ID=casptone-of-ours
+ENV STORAGE_BUCKET=casptone-of-ours.appspot.com
+ENV MESSAGING_SENDERID=643160831565
+ENV APP_ID=1:643160831565:web:838b20b4a4309fe08d0e04
+
+# Expose port 8080
+EXPOSE 8080
+
+# Start the Cloud SQL Auth proxy and then your Node.js application
+CMD ["sh", "-c", "/usr/local/bin/cloud_sql_proxy --address 0.0.0.0 --port 1234 casptone-of-ours:asia-southeast2:moodify-sql-instance & npm start"]
+```
+
+- CloudBuild.yaml
+```bash
+steps:
+# Step 1: Build the Docker image
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['build', '-t', 'gcr.io/$PROJECT_ID/moodify', '.']
+
+# Step 2: Push the Docker image to Google Container Registry
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['push', 'gcr.io/$PROJECT_ID/moodify']
+
+# Step 3: Deploy to Cloud Run
+- name: 'gcr.io/cloud-builders/gcloud'
+  args:
+  - 'run'
+  - 'deploy'
+  - 'moodify'
+  - '--image=gcr.io/$PROJECT_ID/moodify'
+  - '--platform=managed'
+  - '--region=asia-southeast2'
+  - '--allow-unauthenticated'
+```
+
+## Testing
+### Endpoint
+#### local `http://localhost:3000`
+##### Production `https://moodify-r25es5rdqq-et.a.run.app`
+#### To test locally, just replace it with the local url
+### 
+
+### Auth
+###### `POST` Login
+- URL `https://moodify-r25es5rdqq-et.a.run.app/auth/login`
+- Request 
+```bash
+{
+    "email": "youremail@gmail.com",
+    "password": "yourpassword"
+}
+```
+- Response
+```bash
+{
+    "message": "Login successful",
+    "user": {
+        "uid": "youruid",
+        "email": "youremail@gmail.com",
+        "emailVerified": true,
+        "isAnonymous": false,
+        "providerData": [
+            {
+                "providerId": "password",
+                "uid": "youremail@gmail.com",
+                "displayName": null,
+                "email": "youremail@gmail.com",
+                "phoneNumber": null,
+                "photoURL": null
+            }
+        ],
+        "stsTokenManager": {
+            "refreshToken": "yourtoken",
+            "accessToken": "yourtoken",
+            "expirationTime": 1718874027512
+        },
+        "createdAt": "1718208344407",
+        "lastLoginAt": "1718870427345",
+        "apiKey": "yours",
+        "appName": "[DEFAULT]"
+    }
+}
+```
+###### `POST` Register
+- URL `https://moodify-r25es5rdqq-et.a.run.app/auth/register`
+- Request 
+```bash
+{
+    "name":"Yourname",
+    "email": "youremail@gmail.com",
+    "password": "yourpassword"
+}
+```
+- Response
+```bash
+{
+    "message": "Email Verification sent!",
+    "user": {
+        "user": {
+            "uid": "youruid",
+            "email": "nurgundul1@gmail.com",
+            "emailVerified": false,
+            "isAnonymous": false,
+            "providerData": [
+                {
+                    "providerId": "password",
+                    "uid": "youremail@gmail.com",
+                    "displayName": null,
+                    "email": "youremail@gmail.com",
+                    "phoneNumber": null,
+                    "photoURL": null
+                }
+            ],
+            "stsTokenManager": {
+                "refreshToken": "zzz",
+                "accessToken": "zzzz",
+                "expirationTime": 1718874267474
+            },
+            "createdAt": "1718870667204",
+            "lastLoginAt": "1718870667204",
+            "apiKey": "yours",
+            "appName": "[DEFAULT]"
+        },
+        "user_info": {
+            "uid": "youruid",
+            "name": "yourname",
+            "updatedAt": "2024-06-20T08:04:28.255Z",
+            "createdAt": "2024-06-20T08:04:28.255Z"
         }
+    }
+}
+```
+###### `POST` Sign in with google
+- URL `https://moodify-r25es5rdqq-et.a.run.app/auth/login/google`
+- Request 
+```bash
+{
+  "idtoken": "yourtokenid"
+}
+```
+- Response
+```bash
+{
+    "message": "Google Sign-In successful",
+    "user": {
+        "uid": "UID",
+        "email": "youremail@gmail.com",
+        "emailVerified": true,
+        "disabled": false,
+        "metadata": {
+            "lastSignInTime": null,
+            "creationTime": "Thu, 20 Jun 2024 08:10:42 GMT",
+            "lastRefreshTime": null
+        },
+        "tokensValidAfterTime": "Thu, 20 Jun 2024 08:10:42 GMT",
+        "providerData": []
+    },
+    "stsTokenManager": {
+        "refreshToken": "yourtoken",
+        "accessToken": "yourtoken",
+        "expirationTime": 1718874683800
     }
 }
 ```
 
 
-- aku dah sesuaiin model, migrasi, sama nambahin data dummy di folder seeders buat testing
 
-- npx sequelize-cli db:seed --seed 20240608052921-mood-copings.js
-- npx sequelize-cli db:seed --seed 20240608051306-seed-coping-types.js
-- npx sequelize-cli db:seed --seed 20240607183503-seed-coping-tools.js
+### User Info
+##### `PUT` Update User Info
+- URL `https://moodify-r25es5rdqq-et.a.run.app/user/profile`
+- Request 
+```bash
+{
+    "name": "yourname",
+    "gender": "Male",
+    "birthday": "1990-01-01",
+    "country": "United States",
+    "phone_number": "1234567890"
+}
 
-- ERD: https://lucid.app/lucidchart/2e7f90ff-782e-49bd-8f7a-cc36b5016108/edit?invitationId=inv_6e0617a8-4873-46ee-9135-86b7394728da&page=qQkJRDF.4LxD#
+```
+- Response
+```bash
+{
+    "message": "Profil berhasil diperbarui"
+}
+```
+##### `GET` User Info 
+- URL `https://moodify-r25es5rdqq-et.a.run.app/user/profile`
+- Response
+```bash
+{
+    "uid": "youruid",
+    "name": "yourname",
+    "gender": "Male",
+    "birthday": "1990-01-01T00:00:00.000Z",
+    "country": "United States",
+    "phone_number": "1234567890",
+    "profile_picture": null,
+    "createdAt": "2024-06-14T14:21:12.000Z",
+    "updatedAt": "2024-06-20T08:13:37.000Z"
+}
+```
+
+### Journal
+##### `ADD` Add Journal
+- URL `https://moodify-r25es5rdqq-et.a.run.app/tool/journal`
+- Request 
+```bash
+{
+    "journal_title":"your journal title",
+    "journal_text":"your description about your journal",
+    "mood":"(automatically) your mood based on detected mood by machine learning"
+}
+
+```
+- Response
+```bash
+{
+    "message": "Journal created successfully",
+    "result": {
+        "journal": {
+            "journal_id": "yourjournalid",
+            "journal_title": "your journal title",
+            "journal_text": "your description about your journal",
+            "uid": "yourUID",
+            "updatedAt": "2024-06-20T08:17:02.124Z",
+            "createdAt": "2024-06-20T08:17:02.124Z"
+        },
+        "mood": {
+            "mood_log_id": "yourmoodlogid",
+            "journal_id": "yourjournalid",
+            "mood": "yourmood",
+            "updatedAt": "2024-06-20T08:17:02.152Z",
+            "createdAt": "2024-06-20T08:17:02.152Z"
+        }
+    }
+}
+```
+##### `GET` Get Journal
+- URL `https://moodify-r25es5rdqq-et.a.run.app/tool/journal`
+
+- Response
+```bash
+{
+        "journal": {
+            "journal_id": "yourjournalid",
+            "journal_title": "your journal title",
+            "journal_text": "your description about your journal",
+            "uid": "yourUID",
+            "updatedAt": "2024-06-20T08:17:02.124Z",
+            "createdAt": "2024-06-20T08:17:02.124Z"
+        }
+}
+```
+##### `PATCH` Edit Journal
+- URL `https://moodify-r25es5rdqq-et.a.run.app/tool/journal`
+- Request 
+```bash
+{
+    "journal_title":"your journal title updated",
+    "journal_text":"your description about your journal updated",
+    "mood":"(automatically) your mood based on detected mood by machine learning"
+}
+
+```
+- Response
+```bash
+{
+    "message": "Journal updated successfully"
+}
+```
+##### `GET` Get Today Journal
+- URL `https://moodify-r25es5rdqq-et.a.run.app/tool/journal/today`
+
+- Response
+```bash
+{
+  {
+        "journal": {
+            "journal_id": "yourjournalid",
+            "journal_title": "your journal title",
+            "journal_text": "your description about your journal",
+            "uid": "yourUID",
+            "updatedAt": "2024-06-20T08:17:02.124Z",
+            "createdAt": "2024-06-20T08:17:02.124Z"
+        }
+  }
+}
+```
+
+### Mood
+###### `GET` Get Today Mood
+- URL `https://moodify-r25es5rdqq-et.a.run.app/tool/mood/today`
+
+- Response
+```bash
+{
+    "mood": [
+        {
+            "mood_log_id": "yourmoodlogid",
+            "journal_id": "yourjournalid",
+            "mood": "yourmood",
+            "createdAt": "2024-06-20T08:17:02.000Z",
+            "updatedAt": "2024-06-20T08:19:50.000Z"
+        }
+    ]
+}
+```
+###### `GET` Get Weekly Mood
+- URL `https://moodify-r25es5rdqq-et.a.run.app/tool/mood/week`
+
+- Response
+```bash
+{
+    "moodLogs": [
+        {
+            "mood_log_id": "yourmoodlogid",
+            "journal_id": "yourjournalid",
+            "mood": "yourmood",
+            "createdAt": "2024-06-20T08:17:02.000Z",
+            "updatedAt": "2024-06-20T08:19:50.000Z"
+        }
+
+                {
+            "mood_log_id": "yourmoodlogid",
+            "journal_id": "yourjournalid",
+            "mood": "yourmood",
+            "createdAt": "2024-06-20T08:17:02.000Z",
+            "updatedAt": "2024-06-20T08:19:50.000Z"
+        }
+
+                {
+            "mood_log_id": "yourmoodlogid",
+            "journal_id": "yourjournalid",
+            "mood": "yourmood",
+            "createdAt": "2024-06-20T08:17:02.000Z",
+            "updatedAt": "2024-06-20T08:19:50.000Z"
+        }
+    ]
+}
+```
+
+### Coping Recommendation
+###### `GET` Coping Recommendation based on detected mood
+- URL `https://moodify-r25es5rdqq-et.a.run.app/coping/coping-recommendations`
+
+- Response for example the detected mood is sadness
+```bash
+{
+    "message": "Coping recommendations retrieved successfully",
+    "recommendations": {
+        "text_affirmation_first": "Not everybody will understand my situation, and it is okay.",
+        "text_affirmation_last": "I deserve love, life, and happiness.",
+        "text_instruction": "Box Breathing\r\n\r\nInstruction:\r\n1. Step One: Breathe in through the nose for a count of 4. \r\n2. Step Two: Hold breath for a count of 4. \r\n3. Step Three: Breath out for a count of 4. \r\n4. Step Four: Hold breath for a count of 4. \r\n5. Repeat 3 times",
+        "urls": {
+            "music": "https://storage.googleapis.com/moodify-bucket-capstone/mood/sadness/music/music_for_sadness.mp3",
+            "podcast": "https://storage.googleapis.com/moodify-bucket-capstone/mood/sadness/podcast/podcast_for_sadness.mp3"
+        }
+    }
+}
+```
