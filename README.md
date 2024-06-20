@@ -72,11 +72,12 @@ steps:
   - '--allow-unauthenticated'
 ```
 
-## Testing
+## Testing in Postman
 ### Endpoint
 #### local `http://localhost:3000`
 ##### Production `https://moodify-r25es5rdqq-et.a.run.app`
 #### To test locally, just replace it with the local url
+#### ⚠️Don't forget to `use access token in each test session`. access token will generated in your `login` . Use in the `Authorization` tab -> `Auth Type` -> `Bearer Token` -> fill your access token
 ### 
 
 ### Auth
