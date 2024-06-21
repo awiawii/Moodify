@@ -20,5 +20,5 @@ Moodify is an application that can identify and comprehend the moods that users 
 |   Learning Paths   |                                Link                                |
 | :----------------: | :----------------------------------------------------------------: |
 |  Machine Learning  | [Link](https://github.com/awiawii/Moodify/tree/Machine-Learning)   |
-| Mobile Development |  [Link]    |
+| Mobile Development |  [Link](https://github.com/awiawii/Moodify/tree/Mobile-Development)|
 |   Cloud Computing  |  [Link](https://github.com/awiawii/Moodify/tree/Cloud-Computing)   |
